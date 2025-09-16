@@ -15,6 +15,8 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 import iotRoutes from "./routes/iot.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 
+import { connectDB } from './utilities/connectDB.js';
+
 dotenv.config();
 
 const app = express();
@@ -32,5 +34,6 @@ app.use("/api/iot", iotRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.listen(process.env.PORT || 3000, () => {
+    connectDB();
     console.log(`Server running on port ${process.env.PORT || 3000} .....`);
 });
