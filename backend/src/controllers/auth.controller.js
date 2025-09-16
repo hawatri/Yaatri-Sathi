@@ -1,15 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model.js';
-
-// Generate JWT Token
-const generateToken = (userId, email, role) => {
-  return jwt.sign(
-    { userId, email, role },
-    process.env.JWT_SECRET,
-    { expiresIn: '24h' }
-  );
-};
+import { generateToken, setTokenCookie, clearTokenCookie } from '../utilities/generateToken.util.js';
 
 // Register new user
 export const register = async (req, res) => {
@@ -37,10 +29,12 @@ export const register = async (req, res) => {
 
     // Generate token
     const token = generateToken(user._id, user.email, user.role);
+    
+    // Set token as HTTP-only cookie
+    setTokenCookie(res, token);
 
     res.status(201).json({
       message: 'User registered successfully',
-      token,
       user: {
         id: user._id,
         email: user.email,
@@ -58,7 +52,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user
-    const user = await User.findOne({ email});
+    const user = await User.findOne({ email, isActive: true });
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -71,10 +65,12 @@ export const login = async (req, res) => {
 
     // Generate token
     const token = generateToken(user._id, user.email, user.role);
+    
+    // Set token as HTTP-only cookie
+    setTokenCookie(res, token);
 
     res.json({
       message: 'Login successful',
-      token,
       user: {
         id: user._id,
         email: user.email,
@@ -89,20 +85,23 @@ export const login = async (req, res) => {
 // Refresh token
 export const refreshToken = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ error: 'Authorization header missing' });
+    // Get token from cookie
+    const token = req.cookies.token;
+    
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
     }
 
-    const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Generate new token
     const newToken = generateToken(decoded.userId, decoded.email, decoded.role);
+    
+    // Set new token as HTTP-only cookie
+    setTokenCookie(res, newToken);
 
     res.json({
-      message: 'Token refreshed successfully',
-      token: newToken
+      message: 'Token refreshed successfully'
     });
   } catch (error) {
     res.status(401).json({ error: 'Invalid or expired token' });
@@ -112,7 +111,9 @@ export const refreshToken = async (req, res) => {
 // Logout user
 export const logout = async (req, res) => {
   try {
-    // In a real application, you might want to blacklist the token
+    // Clear the token cookie
+    clearTokenCookie(res);
+    
     res.json({ message: 'Logout successful' });
   } catch (error) {
     res.status(500).json({ error: error.message });
