@@ -14,6 +14,7 @@ import anomalyRoutes from "./routes/anomaly.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import iotRoutes from "./routes/iot.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import journeyRoutes from './routes/journey.routes.js';
 
 import { connectDB } from './utilities/connectDB.js';
 
@@ -32,6 +33,7 @@ app.use("/api/anomaly", anomalyRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/iot", iotRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/api/journey', journeyRoutes);
 
 app.listen(process.env.PORT || 3000, () => {
     connectDB();
