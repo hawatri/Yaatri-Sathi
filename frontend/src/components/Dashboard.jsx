@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 
 export default function Dashboard() {
@@ -8,7 +9,7 @@ export default function Dashboard() {
     activeIncidents: 4,
     responseTime: "5 mins",
   });
-
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 to-black flex flex-col text-white">
       {/* Navbar */}
@@ -65,7 +66,8 @@ export default function Dashboard() {
           <p className="text-gray-300 mb-6">
             Create and manage your journeys with real-time safety insights.
           </p>
-          <button className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-lg font-semibold transition">
+          <button onClick={() => navigate('/create-journey')} 
+          className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-lg font-semibold transition">
             + Create Journey
           </button>
         </div>
