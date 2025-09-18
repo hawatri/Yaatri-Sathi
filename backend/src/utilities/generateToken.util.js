@@ -1,7 +1,7 @@
 // Generate JWT Token
-const generateToken = (userId, email, role) => {
+const generateToken = (userId, email) => {
   return jwt.sign(
-    { userId, email, role },
+    { userId, email},
     process.env.JWT_SECRET,
     { expiresIn: '24h' }
   );
