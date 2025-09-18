@@ -73,7 +73,6 @@ export default function Dashboard() {
 
       {/* Footer */}
       <footer className="mt-10 border-t border-gray-700 py-6 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center text-sm">
-        {/* System Status */}
         <div>
           <h3 className="font-semibold mb-2">System Status</h3>
           <p className="flex items-center justify-center gap-2 text-green-400">
