@@ -6,7 +6,7 @@ import { generateToken, setTokenCookie, clearTokenCookie } from '../utilities/ge
 // Register new user
 export const register = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const {name, email, password  } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -20,15 +20,15 @@ export const register = async (req, res) => {
 
     // Create user
     const user = new User({
+      name,
       email,
       password: hashedPassword,
-      role: role || 'tourist'
     });
 
     await user.save();
 
     // Generate token
-    const token = generateToken(user._id, user.email, user.role);
+    const token = generateToken(user._id, user.email);
     
     // Set token as HTTP-only cookie
     setTokenCookie(res, token);
@@ -64,7 +64,7 @@ export const login = async (req, res) => {
     }
 
     // Generate token
-    const token = generateToken(user._id, user.email, user.role);
+    const token = generateToken(user._id, user.email);
     
     // Set token as HTTP-only cookie
     setTokenCookie(res, token);
@@ -74,7 +74,6 @@ export const login = async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
-        role: user.role
       }
     });
   } catch (error) {
@@ -95,7 +94,7 @@ export const refreshToken = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Generate new token
-    const newToken = generateToken(decoded.userId, decoded.email, decoded.role);
+    const newToken = generateToken(decoded.userId, decoded.email);
     
     // Set new token as HTTP-only cookie
     setTokenCookie(res, newToken);

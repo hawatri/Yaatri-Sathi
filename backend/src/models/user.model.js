@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    name:{
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -14,15 +18,6 @@ const userSchema = new mongoose.Schema(
       required: true,
     }, // hashed password
 
-    role: {
-      type: String,
-      enum: ["tourist", "police", "admin", "tourism_dept"],
-      default: "tourist",
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
   },
   { timestamps: true }
 );
