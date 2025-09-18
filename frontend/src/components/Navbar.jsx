@@ -1,3 +1,5 @@
+import ProfileDropdown from "./ProfileDropdown";
+
 const Navbar = () => {
   return (
     <nav className="bg-black/50 backdrop-blur-md text-white px-8 py-4 flex justify-between items-center shadow-lg">
@@ -10,6 +12,7 @@ const Navbar = () => {
         <button className="hover:text-blue-400 transition">Incidents</button>
         <button className="hover:text-blue-400 transition">Reports</button>
         <button className="hover:text-blue-400 transition">Settings</button>
+        <ProfileDropdown/>
       </div>
     </nav>
   );
