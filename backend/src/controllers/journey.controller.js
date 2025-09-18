@@ -4,7 +4,15 @@ import { User } from '../models/user.model.js';
 // Create a new journey
 export const createJourney = async (req, res) => {
   try {
-    const { name, description, startDate, endDate } = req.body;
+    const { 
+      departureDate, 
+      arrivalDate, 
+      travelMedium, 
+      travelItinerary, 
+      hotelName, 
+      hotelContactNo, 
+      familyMembers 
+    } = req.body;
 
     const touristId = req.user.userId;
     
@@ -16,11 +24,14 @@ export const createJourney = async (req, res) => {
     
     const journey = new Journey({
       touristId,
-      name,
-      description,
-      startDate,
-      endDate,
-      status: 'planning'
+      departureDate,
+      arrivalDate,
+      travelMedium,
+      travelItinerary,
+      hotelName,
+      hotelContactNo,
+      familyMembers,
+      status: 'planned'
     });
     
     await journey.save();
@@ -45,7 +56,7 @@ export const getJourneys = async (req, res) => {
     
     const journeys = await Journey.find(query)
       .populate('touristId', 'email')
-      .sort({ startDate: -1 });
+      .sort({ departureDate: -1 });
     
     res.json({ journeys, count: journeys.length });
   } catch (error) {
@@ -76,6 +87,11 @@ export const updateJourney = async (req, res) => {
   try {
     const { journeyId } = req.params;
     const updates = req.body;
+    
+    // Prevent changing the touristId
+    if (updates.touristId) {
+      delete updates.touristId;
+    }
     
     const journey = await Journey.findByIdAndUpdate(
       journeyId,
@@ -113,68 +129,18 @@ export const deleteJourney = async (req, res) => {
   }
 };
 
-// Add a location to the itinerary
-export const addItineraryItem = async (req, res) => {
-  try {
-    const { journeyId } = req.params;
-    const itineraryItem = req.body;
-    
-    const journey = await Journey.findByIdAndUpdate(
-      journeyId,
-      { $push: { itinerary: itineraryItem } },
-      { new: true, runValidators: true }
-    );
-    
-    if (!journey) {
-      return res.status(404).json({ error: 'Journey not found' });
-    }
-    
-    res.json({
-      message: 'Itinerary item added successfully',
-      journey
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Record a visited location
-export const addVisitedLocation = async (req, res) => {
-  try {
-    const { journeyId } = req.params;
-    const locationData = req.body;
-    
-    const journey = await Journey.findByIdAndUpdate(
-      journeyId,
-      { $push: { visitedLocations: locationData } },
-      { new: true }
-    );
-    
-    if (!journey) {
-      return res.status(404).json({ error: 'Journey not found' });
-    }
-    
-    res.json({
-      message: 'Visited location recorded successfully',
-      journey
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 // Get current journey for a tourist
 export const getCurrentJourney = async (req, res) => {
   try {
-    const { touristId } = req.params;
+    const touristId = req.user.userId;
     
     const currentDate = new Date();
     
     const journey = await Journey.findOne({
       touristId,
-      startDate: { $lte: currentDate },
-      endDate: { $gte: currentDate },
-      status: 'active'
+      departureDate: { $lte: currentDate },
+      arrivalDate: { $gte: currentDate },
+      status: 'in-progress'
     })
     .populate('touristId', 'email');
     

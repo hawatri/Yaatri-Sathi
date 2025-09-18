@@ -8,160 +8,92 @@ const journeySchema = new mongoose.Schema(
       required: true
     },
 
-    name: {
-      type: String,
-      required: true,
-      trim: true
-    },
-
-    description: {
-      type: String,
-      trim: true
-    },
-
-    startDate: {
+    departureDate: {
       type: Date,
       required: true
     },
 
-    endDate: {
+    arrivalDate: {
       type: Date,
       required: true
     },
 
-    // Main itinerary with planned locations
-    itinerary: [
-      {
-        place: {
-          type: String,
-          required: true,
-          trim: true
-        },
-
-        coordinates: {
-          type: {
-            type: String,
-            enum: ['Point'],
-            default: 'Point'
-          },
-          coordinates: {
-            type: [Number], // [longitude, latitude]
-            required: true
-          }
-        },
-
-        startDate: {
-          type: Date,
-          required: true
-        },
-
-        endDate: {
-          type: Date,
-          required: true
-        },
-
-        description: {
-          type: String,
-          trim: true
-        },
-
-        status: {
-          type: String,
-          enum: ['planned', 'in-progress', 'completed', 'cancelled'],
-          default: 'planned'
-        }
-      }
-    ],
-
-    // Actual visited locations with timestamps
-    visitedLocations: [
-      {
-        coordinates: {
-          type: {
-            type: String,
-            enum: ['Point'],
-            default: 'Point'
-          },
-          coordinates: {
-            type: [Number], // [longitude, latitude]
-            required: true
-          }
-        },
-
-        timestamp: {
-          type: Date,
-          default: Date.now
-        },
-
-        placeName: {
-          type: String,
-          trim: true
-        }
-      }
-    ],
-
-    // Journey status
-    status: {
+    travelMedium: {
       type: String,
-      enum: ['planning', 'active', 'completed', 'cancelled'],
-      default: 'planning'
+      trim: true
     },
 
-    // Emergency contacts specific to this journey
-    emergencyContacts: [
+    travelItinerary: {
+      type: String,
+      trim: true
+    },
+
+    hotelName: {
+      type: String,
+      trim: true
+    },
+
+    hotelContactNo: {
+      type: String,
+      trim: true
+    },
+
+    familyMembers: [
       {
         name: {
           type: String,
           required: true,
           trim: true
         },
-
-        relationship: {
-          type: String,
-          trim: true
-        },
-
-        phone: {
+        relation: {
           type: String,
           required: true,
           trim: true
         },
-
-        primary: {
-          type: Boolean,
-          default: false
+        age: {
+          type: Number,
+          required: true
         }
       }
-    ]
+    ],
+
+    status: {
+      type: String,
+      enum: ['planned', 'in-progress', 'completed', 'cancelled'],
+      default: 'planned'
+    }
   },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true }
   }
 );
 
 // Create indexes for efficient querying
 journeySchema.index({ touristId: 1, status: 1 });
-journeySchema.index({ 'itinerary.coordinates': '2dsphere' });
-journeySchema.index({ 'visitedLocations.coordinates': '2dsphere' });
-journeySchema.index({ startDate: 1, endDate: 1 });
+journeySchema.index({ departureDate: 1, arrivalDate: 1 });
 
-// Virtual for journey duration in days
-journeySchema.virtual('duration').get(function() {
-  return Math.ceil((this.endDate - this.startDate) / (1000 * 60 * 60 * 24));
+// Virtual for formatted dates (dd-mm-yyyy)
+journeySchema.virtual('departureDateFormatted').get(function() {
+  if (!this.departureDate) return null;
+  const day = String(this.departureDate.getDate()).padStart(2, '0');
+  const month = String(this.departureDate.getMonth() + 1).padStart(2, '0');
+  const year = this.departureDate.getFullYear();
+  return `${day}-${month}-${year}`;
 });
 
-// Method to check if journey is currently active
-journeySchema.methods.isActive = function() {
-  const now = new Date();
-  return this.startDate <= now && this.endDate >= now && this.status === 'active';
-};
+journeySchema.virtual('arrivalDateFormatted').get(function() {
+  if (!this.arrivalDate) return null;
+  const day = String(this.arrivalDate.getDate()).padStart(2, '0');
+  const month = String(this.arrivalDate.getMonth() + 1).padStart(2, '0');
+  const year = this.arrivalDate.getFullYear();
+  return `${day}-${month}-${year}`;
+});
 
-// Method to get current location if journey is active
-journeySchema.methods.getCurrentLocation = function() {
-  if (this.visitedLocations.length > 0) {
-    return this.visitedLocations[this.visitedLocations.length - 1];
-  }
-  return null;
-};
+// Virtual for journey duration in days
+journeySchema.virtual('durationDays').get(function() {
+  if (!this.arrivalDate || !this.departureDate) return 0;
+  return Math.ceil((this.arrivalDate - this.departureDate) / (1000 * 60 * 60 * 24));
+});
 
 export const Journey = mongoose.model('Journey', journeySchema);
