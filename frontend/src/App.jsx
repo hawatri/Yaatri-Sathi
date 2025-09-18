@@ -4,6 +4,7 @@ import LandingPage from "./components/LandingPage";
  import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import CreateJourney from "./components/CreateJourney";
+import KYCform from "./components/KYCForm";
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
         <Route path="/create-journey" element={<CreateJourney />} />
         <Route path="/sign-up" element={<SignUp />} /> 
         <Route path="/login" element={<Login />} />
+        <Route path="/KYCForm" element={<KYCform />} />
+
       </Routes>
     </Router>
   );
