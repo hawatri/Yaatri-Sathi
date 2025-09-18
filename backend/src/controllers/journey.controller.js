@@ -4,7 +4,9 @@ import { User } from '../models/user.model.js';
 // Create a new journey
 export const createJourney = async (req, res) => {
   try {
-    const { touristId, name, description, startDate, endDate } = req.body;
+    const { name, description, startDate, endDate } = req.body;
+
+    const touristId = req.user.userId;
     
     // Check if tourist exists
     const tourist = await User.findById(touristId);
@@ -35,7 +37,7 @@ export const createJourney = async (req, res) => {
 // Get all journeys for a tourist
 export const getJourneys = async (req, res) => {
   try {
-    const { touristId } = req.params;
+    const touristId = req.user.userId;
     const { status } = req.query;
     
     let query = { touristId };
