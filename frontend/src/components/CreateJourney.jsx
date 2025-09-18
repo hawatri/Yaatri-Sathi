@@ -96,7 +96,7 @@ export default function CreateJourney() {
           <FormSection title="Personal Information">
             <InputField id="dob" name="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleChange} />
             <InputField id="nationality" name="nationality" label="Nationality" placeholder="e.g., Indian" value={formData.nationality} onChange={handleChange} />
-            <InputField id="aadhaarNumber" name="aadhaarNumber" label="Aadhaar Number" placeholder="XXXX XXXX XXXX" value={formData.aadhaarNumber} onChange={handleChange} />
+            <InputField id="aadhaarNumber" name="aadhaarNumber" label="Passport/Aadhaar Number" placeholder="XXXX XXXX XXXX" value={formData.aadhaarNumber} onChange={handleChange} />
             <InputField id="visaInfo" name="visaInfo" label="Visa Information (if applicable)" placeholder="e.g., B1/B2, Schengen" value={formData.visaInfo} onChange={handleChange} />
           </FormSection>
           
