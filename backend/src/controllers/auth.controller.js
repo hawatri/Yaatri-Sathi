@@ -8,29 +8,51 @@ export const register = async (req, res) => {
   try {
     console.log('Register request received:', req.body);
     
-    const {name, email, password} = req.body;
+    const { name, email, password } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !password) {
+      return res.status(400).json({ 
+        error: 'Name, email, and password are required' 
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ 
+        error: 'Please enter a valid email address' 
+      });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res.status(400).json({ 
+        error: 'Password must be at least 6 characters long' 
+      });
+    }
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       console.log('User already exists:', email);
       return res.status(400).json({ error: 'User already exists with this email' });
     }
 
     // Hash password
-    const saltRounds = 10;
+    const saltRounds = 12; // Increased from 10 for better security
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     console.log('Password hashed successfully');
 
     // Create user
     const user = new User({
-      name,
-      email,
+      name: name.trim(),
+      email: email.toLowerCase(),
       password: hashedPassword,
     });
 
     await user.save();
-    console.log('User saved to database:', user);
+    console.log('User saved to database:', { id: user._id, email: user.email });
 
     // Generate token
     const token = generateToken(user._id, user.email);
@@ -41,6 +63,7 @@ export const register = async (req, res) => {
     console.log('Token cookie set');
 
     res.status(201).json({
+      success: true,
       message: 'User registered successfully',
       user: {
         id: user._id,
@@ -50,24 +73,44 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: error.message });
+    
+    // Handle mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ error: messages.join(', ') });
+    }
+    
+    // Handle duplicate key error (in case unique index fails)
+    if (error.code === 11000) {
+      return res.status(400).json({ error: 'User already exists with this email' });
+    }
+    
+    res.status(500).json({ error: 'Internal server error. Please try again later.' });
   }
 };
+
 // Login user
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
-    const user = await User.findOne({ email});
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ 
+        error: 'Email and password are required' 
+      });
+    }
+
+    // Find user (case insensitive email)
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     // Generate token
@@ -77,6 +120,7 @@ export const login = async (req, res) => {
     setTokenCookie(res, token);
 
     res.json({
+      success: true,
       message: 'Login successful',
       user: {
         id: user._id,
@@ -85,11 +129,10 @@ export const login = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error. Please try again later.' });
   }
 };
-
-// ... rest of the file remains the same
 
 // Refresh token
 export const refreshToken = async (req, res) => {
