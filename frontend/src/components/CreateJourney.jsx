@@ -61,7 +61,7 @@ export default function CreateJourney() {
     });
 
     try {
-      const response = await axios.post("http://localhost:6969/api/journey", journeyData, {
+      const response = await axios.post("http://localhost:5000/api/journey", journeyData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       console.log("Server Response: ", response.data);
