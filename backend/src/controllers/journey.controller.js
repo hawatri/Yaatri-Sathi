@@ -37,7 +37,7 @@ export const createJourney = async (req, res) => {
 // Get all journeys for a tourist
 export const getJourneys = async (req, res) => {
   try {
-    const { touristId } = req.params;
+    const touristId = req.user.userId;
     const { status } = req.query;
     
     let query = { touristId };
