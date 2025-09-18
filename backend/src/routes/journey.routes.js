@@ -9,7 +9,7 @@ import {
   addVisitedLocation,
   getCurrentJourney
 } from '../controllers/journey.controller.js';
-import { authenticate } from '../middleware/auth.js';
+import { authenticate } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
