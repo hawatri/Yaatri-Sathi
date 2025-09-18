@@ -2,7 +2,6 @@ import { useState } from "react";
 import Navbar from "./Navbar";
 
 export default function Dashboard() {
-  // Mock state data (later you can fetch from backend)
   const [stats] = useState({
     activeTourists: 120,
     safeZones: 35,
