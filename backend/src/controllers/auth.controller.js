@@ -6,17 +6,21 @@ import { generateToken, setTokenCookie, clearTokenCookie } from '../utilities/ge
 // Register new user
 export const register = async (req, res) => {
   try {
-    const {name, email, password  } = req.body;
+    console.log('Register request received:', req.body);
+    
+    const {name, email, password} = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('User already exists:', email);
       return res.status(400).json({ error: 'User already exists with this email' });
     }
 
     // Hash password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log('Password hashed successfully');
 
     // Create user
     const user = new User({
@@ -26,26 +30,29 @@ export const register = async (req, res) => {
     });
 
     await user.save();
+    console.log('User saved to database:', user);
 
     // Generate token
     const token = generateToken(user._id, user.email);
+    console.log('Token generated');
     
     // Set token as HTTP-only cookie
     setTokenCookie(res, token);
+    console.log('Token cookie set');
 
     res.status(201).json({
       message: 'User registered successfully',
       user: {
         id: user._id,
+        name: user.name,
         email: user.email,
-        role: user.role
       }
     });
   } catch (error) {
+    console.error('Registration error:', error);
     res.status(500).json({ error: error.message });
   }
 };
-
 // Login user
 export const login = async (req, res) => {
   try {
@@ -73,6 +80,7 @@ export const login = async (req, res) => {
       message: 'Login successful',
       user: {
         id: user._id,
+        name: user.name,
         email: user.email,
       }
     });
@@ -80,6 +88,8 @@ export const login = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// ... rest of the file remains the same
 
 // Refresh token
 export const refreshToken = async (req, res) => {

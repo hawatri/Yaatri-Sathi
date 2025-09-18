@@ -4,6 +4,8 @@ import cors from 'cors';
 
 import dotenv from 'dotenv';
 
+import cookieParser from 'cookie-parser';
+
 import authRoutes from "./routes/auth.routes.js";
 import digitalIdRoutes from "./routes/digitalId.routes.js";
 import touristsRoutes from "./routes/tourists.routes.js";
@@ -21,13 +23,15 @@ import { connectDB } from './utilities/connectDB.js';
 dotenv.config();
 
 const app = express();
-app.use(express.json());
 
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
     
 }))
+app.use(cookieParser());
+app.use(express.json());
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/digital-id", digitalIdRoutes);

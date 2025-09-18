@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken';
+
 // Generate JWT Token
 const generateToken = (userId, email) => {
   return jwt.sign(
