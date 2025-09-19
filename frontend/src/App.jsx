@@ -16,7 +16,6 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} /> 
         <Route path="/login" element={<Login />} />
         <Route path="/KYCForm" element={<KYCform />} />
-
       </Routes>
     </Router>
   );
