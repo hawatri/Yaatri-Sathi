@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,8 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:6969";
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,16 +26,20 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        'http://localhost:6969/api/auth/login', 
+        `${API_URL}/api/auth/login`, 
         formData,
-        { withCredentials: true } //  For sending/receiving cookies
+        { withCredentials: true }
       );
       
       console.log("Login successful:", response.data);
       
-      // After a successful login, navigate to the main part of your app
-      navigate('/'); 
-
+      // Store user data and token in context and localStorage
+      if (response.data.token && response.data.user) {
+        login(response.data.user, response.data.token);
+        navigate('/dashboard');
+      } else {
+        setError("Invalid response from server");
+      }
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data?.message || "Invalid email or password.");
@@ -87,7 +94,7 @@ export default function Login() {
         </form>
 
         <p className="text-center text-gray-300 text-sm mt-6">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link to="/sign-up" className="text-blue-400 hover:underline">
             Sign Up
           </Link>

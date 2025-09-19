@@ -16,6 +16,7 @@ export default function CreateJourney() {
     hotelContactNo: "",
     familyMembers: [{ name: "", relation: "", age: "" }],
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,12 +51,29 @@ export default function CreateJourney() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const token = localStorage.getItem("token"); // assuming JWT stored in localStorage
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        alert("Please log in first");
+        setIsLoading(false);
+        return;
+      }
+
+      // Convert age to numbers for family members
+      const formattedData = {
+        ...formData,
+        familyMembers: formData.familyMembers.map(member => ({
+          ...member,
+          age: Number(member.age) || 0
+        }))
+      };
+
       const response = await axios.post(
-        "http://localhost:6969/api/journey/create",
-        formData,
+        "/api/journey/create", // Use relative path or configure base URL
+        formattedData,
         {
           headers: {
             "Content-Type": "application/json",
@@ -66,9 +84,26 @@ export default function CreateJourney() {
 
       console.log("Server Response: ", response.data);
       alert("Journey Created Successfully ✅");
+      
+      // Reset form after successful submission
+      setFormData({
+        departureDate: "",
+        arrivalDate: "",
+        travelMedium: "",
+        travelItinerary: "",
+        hotelName: "",
+        hotelContactNo: "",
+        familyMembers: [{ name: "", relation: "", age: "" }],
+      });
     } catch (error) {
       console.error("Error submitting the form: ", error);
-      alert("Failed to create journey.");
+      if (error.response?.status === 401) {
+        alert("Session expired. Please log in again.");
+      } else {
+        alert("Failed to create journey. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -93,6 +128,7 @@ export default function CreateJourney() {
               type="date"
               value={formData.departureDate}
               onChange={handleChange}
+              required
             />
             <InputField
               id="arrivalDate"
@@ -101,6 +137,7 @@ export default function CreateJourney() {
               type="date"
               value={formData.arrivalDate}
               onChange={handleChange}
+              required
             />
             <InputField
               id="travelMedium"
@@ -152,9 +189,12 @@ export default function CreateJourney() {
 
           <button
             type="submit"
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+            disabled={isLoading}
+            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white ${
+              isLoading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors`}
           >
-            Create Journey
+            {isLoading ? "Creating..." : "Create Journey"}
           </button>
         </form>
       </div>
