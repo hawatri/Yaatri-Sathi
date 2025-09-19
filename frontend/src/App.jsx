@@ -6,6 +6,7 @@ import Dashboard from "./components/Dashboard";
 import CreateJourney from "./components/CreateJourney";
 import KYCform from "./components/KYCForm";
 import { AuthProvider } from "./contexts/AuthContext";
+import Features from "./components/Features";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} /> 
         <Route path="/login" element={<Login />} />
         <Route path="/KYCForm" element={<KYCform />} />
+        <Route path="/features" element={<Features />} />
 
       </Routes>
     </Router>
