@@ -1,7 +1,20 @@
-import backgroundImage from "../assets/bgimage.jpg"; 
+import backgroundImage from "../assets/bgimage.jpg";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function LandingPage() {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    if (currentUser) {
+      navigate("/dashboard");
+    } else {
+      navigate("/sign-up");
+    }
+  };
+
   return (
     <div
       className="h-screen w-full bg-cover bg-center bg-fixed relative flex flex-col"
@@ -37,12 +50,21 @@ export default function LandingPage() {
           <Link to="/support" className="text-white hover:text-gray-300">
             Support
           </Link>
-          <Link
-            to="/sign-up"
-            className="ml-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            Sign Up
-          </Link>
+          {currentUser ? (
+            <Link
+              to="/dashboard"
+              className="ml-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              to="/sign-up"
+              className="ml-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              Sign Up
+            </Link>
+          )}
         </nav>
       </header>
 
@@ -55,12 +77,12 @@ export default function LandingPage() {
           alerts and quick access to emergency services, SafeTrek ensures you
           can enjoy your adventures with peace of mind.
         </p>
-        <Link
-          to="/get-started"
+        <button
+          onClick={handleGetStarted}
           className="bg-blue-600 px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
         >
           Get Started
-        </Link>
+        </button>
       </div>
     </div>
   );

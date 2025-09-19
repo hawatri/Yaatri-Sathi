@@ -5,9 +5,11 @@ import LandingPage from "./components/LandingPage";
 import Dashboard from "./components/Dashboard";
 import CreateJourney from "./components/CreateJourney";
 import KYCform from "./components/KYCForm";
+import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -19,6 +21,7 @@ function App() {
 
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 
