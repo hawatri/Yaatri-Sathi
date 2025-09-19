@@ -44,8 +44,8 @@ export default function LandingPage() {
           <Link to="/features" className="text-white hover:text-gray-300">
             Features
           </Link>
-          <Link to="/pricing" className="text-white hover:text-gray-300">
-            Pricing
+          <Link to="/emergency" className="text-white hover:text-gray-300">
+            Emergency
           </Link>
           <Link to="/support" className="text-white hover:text-gray-300">
             Support
