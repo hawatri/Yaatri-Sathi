@@ -50,21 +50,12 @@ export default function LandingPage() {
           <Link to="/support" className="text-white hover:text-gray-300">
             Support
           </Link>
-          {currentUser ? (
-            <Link
-              to="/dashboard"
-              className="ml-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <Link
+          <Link
               to="/sign-up"
               className="ml-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
             >
               Sign Up
             </Link>
-          )}
         </nav>
       </header>
 

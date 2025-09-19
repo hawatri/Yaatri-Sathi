@@ -114,20 +114,22 @@ export const login = async (req, res) => {
     }
 
     // Generate token
-    const token = generateToken(user._id, user.email);
-    
-    // Set token as HTTP-only cookie
-    setTokenCookie(res, token);
+   // In your login function, after generating the token:
+const token = generateToken(user._id, user.email);
 
-    res.json({
-      success: true,
-      message: 'Login successful',
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      }
-    });
+// Set token as HTTP-only cookie
+setTokenCookie(res, token);
+
+res.json({
+  success: true,
+  message: 'Login successful',
+  token: token, // Add this line
+  user: {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+  }
+});
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error. Please try again later.' });

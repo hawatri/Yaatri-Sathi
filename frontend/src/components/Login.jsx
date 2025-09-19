@@ -33,16 +33,17 @@ export default function Login() {
       
       console.log("Login successful:", response.data);
       
-      // Store user data and token in context and localStorage
-      if (response.data.token && response.data.user) {
-        login(response.data.user, response.data.token);
-        navigate('/dashboard');
+      // Check for success and user data (token is handled via HTTP-only cookies)
+      if (response.data.success && response.data.user) {
+        // Call login with user data only (no token needed for cookie-based auth)
+        login(response.data.user);
+        navigate('/get-started');
       } else {
-        setError("Invalid response from server");
+        setError("Login failed. Please try again.");
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.response?.data?.message || "Invalid email or password.");
+      setError(err.response?.data?.error || "Invalid email or password.");
     } finally {
       setLoading(false);
     }
