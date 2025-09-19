@@ -118,8 +118,8 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-black px-6 py-12">
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-8 border border-white/20">
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-black px-6 py-8 overflow-hidden">
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-8 border border-white/20 m-15 ">
         {/* Heading */}
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">
@@ -129,10 +129,10 @@ export default function SignupPage() {
         </div>
 
         {/* Form */}
-        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+        <form className="space-y-3" onSubmit={handleSubmit} noValidate>
           {/* Name */}
           <div>
-            <label className="block text-white text-sm font-medium mb-2">
+            <label className="block text-white text-sm font-medium mb-0">
               Full Name
             </label>
             <input
